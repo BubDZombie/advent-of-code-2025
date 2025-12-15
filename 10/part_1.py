@@ -9,6 +9,7 @@ class Machine():
         self.indicator = None
         self.joltages = []
         self.joltage_requirements = []
+        self.joltage_diff = []
         self.state = 0
 
     def __str__(self):
@@ -19,7 +20,7 @@ class Machine():
         output += ')'
         output += f"\n  Joltage Req: {self.joltage_requirements}"
         output += f" Curr: {self.joltages}"
-        output += f" Need: {[self.joltage_requirements[i] - self.joltages[i] for i in range(len(self.joltages))]}"
+        output += f" Need: {self.joltage_diff}"
         return output
 
     def add_button(self, button):
@@ -50,10 +51,13 @@ class Machine():
         for i in range(len(self.joltages)):
             if button & 1<<i:
                 self.joltages[i] += 1
+                self.joltage_diff[i] -= 1
 
     def reset(self):
         self.state = 0
-        self.joltages = [0 for joltage in self.joltage_requirements]
+        for i, joltage in enumerate(self.joltage_requirements):
+            self.joltages[i] = 0
+            self.joltage_diff[i] = joltage
 
     def set_indicator(self, indicator_string):
         self.indicator = 0
@@ -63,6 +67,7 @@ class Machine():
 
     def set_joltage_requirements(self, joltages):
         self.joltage_requirements = joltages
+        self.joltage_diff = [joltage for joltage in joltages]
         self.joltages = [0 for joltage in joltages]
 
     def similarity(self):
